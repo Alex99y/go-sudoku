@@ -2,11 +2,16 @@ package main
 
 import "fmt"
 
-func isValidSudoku(sudokuArray [9][9]int) bool {
+// Sudoku is ...
+type Sudoku struct {
+	sudokuArray [9][9]int
+}
+
+func ( s Sudoku ) isValidSudoku() bool {
 	var i, j int
 	for i = 0; i < 9; i++ {
 		for j = 0; j < 9; j++ {
-			if sudokuArray[i][j] == 0 {
+			if s.sudokuArray[i][j] == 0 {
 				return false
 			}
 		}
@@ -14,7 +19,7 @@ func isValidSudoku(sudokuArray [9][9]int) bool {
 	return true
 }
 
-func subArray(value int, row int, col int, sudokuArray [9][9]int) bool {
+func ( s Sudoku ) subArray(value int, row int, col int) bool {
 	var iCol, jCol, iRow, jRow int
 	if col < 3 && row < 3 {
 		// Check first quadrant
@@ -47,7 +52,7 @@ func subArray(value int, row int, col int, sudokuArray [9][9]int) bool {
 	var i, j int
 	for j = iCol; j < jCol; j++ {
 		for i= iRow; i < jRow; i++ {
-			if sudokuArray[j][i] == value {
+			if s.sudokuArray[j][i] == value {
 				return false
 			}
 		}
@@ -56,33 +61,33 @@ func subArray(value int, row int, col int, sudokuArray [9][9]int) bool {
 	return true
 }
 
-func isValidPosition(value int, row int, col int, sudokuArray [9][9]int) bool {
+func ( s Sudoku ) isValidPosition(value int, row int, col int) bool {
 	var i, j int
 	// Check current position
-	if sudokuArray[row][col] != 0 {
+	if s.sudokuArray[row][col] != 0 {
 		return false
 	}
 	// Check horizontal position
 	for i = 0; i < 9; i++ {
-		if sudokuArray[row][i] == value {
+		if s.sudokuArray[row][i] == value {
 			return false
 		}
 	}
 	// Check vertical position
 	for j = 0; j < 9; j++ {
-		if sudokuArray[j][col] == value {
+		if s.sudokuArray[j][col] == value {
 			return false
 		}
 	}
 	// Check subArrays
-	return subArray(value, row, col, sudokuArray)
+	return s.subArray(value, row, col)
 }
 
-func findNextPosition(sudokuArray [9][9]int) (int, int, bool) {
+func ( s Sudoku ) findNextPosition() (int, int, bool) {
 	var row, col int
 	for row = 0; row < 9; row++ {
 		for col = 0; col < 9; col++ {
-			if sudokuArray[row][col] == 0 {
+			if s.sudokuArray[row][col] == 0 {
 				return row, col, true
 			}
 		}
@@ -91,24 +96,24 @@ func findNextPosition(sudokuArray [9][9]int) (int, int, bool) {
 }
 
 
-func sudokuBacktracking(sudokuArray [9][9]int) bool {
-	if (isValidSudoku(sudokuArray)) {
-		fmt.Print(sudokuArray)
+func ( s Sudoku ) sudokuBacktracking() bool {
+	if (s.isValidSudoku()) {
+		fmt.Print(s.sudokuArray)
 		return true;
 	}
 	var i, j, e int
 	var b bool
-	i, j, b = findNextPosition(sudokuArray);
+	i, j, b = s.findNextPosition();
 	if (!b) {
 		return true
 	}
 	for e = 1; e < 10; e++ {
-		if isValidPosition(e, i, j, sudokuArray) {
-			sudokuArray[i][j] = e
-			if sudokuBacktracking(sudokuArray) {
+		if s.isValidPosition(e, i, j) {
+			s.sudokuArray[i][j] = e
+			if s.sudokuBacktracking() {
 				return true
 			}
-			sudokuArray[i][j] = 0
+			s.sudokuArray[i][j] = 0
 		}
 	}
 
@@ -127,5 +132,7 @@ func main() {
 		{0, 0, 0, 0, 0, 0, 0, 5, 9},
 		{0, 0, 3, 4, 0, 8, 0, 0, 0},
 	}
-	sudokuBacktracking(sudokuArray)
+	var sudoku Sudoku
+	sudoku.sudokuArray = sudokuArray
+	sudoku.sudokuBacktracking()
 }
